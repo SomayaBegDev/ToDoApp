@@ -9,110 +9,109 @@ import 'package:path/path.dart';
 class DBHelper {
   DBHelper._();
   static final DBHelper dbHelper = DBHelper._();
+  final String tableName = "task";
+  final String firstColName = "taskID";
+  final String sectColName = "taskTitle";
+  final String thiColName = "taskState";
 
-  static final dbName = "thestateof.db";
-  static final tableName = "Task";
-  static final firstColName = "taskID";
-  static final sectColName = "taskTitle";
-  static final thiColName = "taskState";
-
-  Database stateofdb;
-  Future<Database> initStateOfDB() async {
-    if (stateofdb == null) {
-      stateofdb = await conectToStateOfdb();
-      return stateofdb;
+  Database stateOfDB;
+  iniDB() async {
+    if (stateOfDB == null) {
+      stateOfDB = await connectToStateOfDB();
+      return stateOfDB;
     } else {
-      return stateofdb;
+      return stateOfDB;
     }
   }
 
-  Future<Database> conectToStateOfdb() async {
-    Directory dbDirec = await getApplicationDocumentsDirectory();
-    String path = join(dbDirec.path, '$dbName');
-    Database stOfdb = await openDatabase(
+  Future<Database> connectToStateOfDB() async {
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String path = join(appDocDir.path, 'tasksDb.db');
+    Database database = await openDatabase(
       path,
       version: 1,
-      onCreate: (mydb, version) {
-        mydb.execute('''CREATE TABLE $tableName(
+      onCreate: (db, version) {
+        db.execute('''CREATE TABLE $tableName(
           $firstColName INTEGER PRIMARY KEY AUTOINCREMENT,
           $sectColName TEXT NOT NULL,
           $thiColName INTEGER NOT NULL
         )''');
       },
     );
-    return stOfdb;
+    return database;
   }
 
-  Future<int> insertNewTask(Map<String, dynamic> record) async {
+  Future<int> insertNewTask(Map<String, dynamic> map) async {
     try {
-      stateofdb = await initStateOfDB();
-      int rowIndex = await stateofdb.insert(tableName, record);
+      stateOfDB = await iniDB();
+      int rowIndex = await stateOfDB.insert(tableName, map);
       return rowIndex;
-    } catch (dbEror) {
-      throw "Database error $dbEror";
+    } catch (error) {
+      throw 'database error $error';
     }
   }
 
   Future<List<Map<String, dynamic>>> myRecords() async {
     try {
-      stateofdb = await initStateOfDB();
-      var rec = await stateofdb.query(tableName);
-      return rec;
-    } catch (dbEror) {
-      throw "Database error $dbEror";
+      stateOfDB = await iniDB();
+      List<Map<String, dynamic>> results = await stateOfDB.query(tableName);
+      return results;
+    } catch (error) {
+      throw 'database error $error';
     }
   }
 
   Future<List<Map<String, dynamic>>> myRecCompletedTask() async {
     try {
-      stateofdb = await initStateOfDB();
-      var rec = await stateofdb
-          .query(tableName, where: '$thiColName =?', whereArgs: [1]);
-      return rec;
-    } catch (dbEror) {
-      throw "Database error $dbEror";
+      stateOfDB = await iniDB();
+      List<Map<String, dynamic>> results = await stateOfDB
+          .query(tableName, where: '$thiColName = ?', whereArgs: [1]);
+      return results;
+    } catch (error) {
+      throw 'database error $error';
     }
   }
 
   Future<List<Map<String, dynamic>>> myRecUncompletedTask() async {
     try {
-      stateofdb = await initStateOfDB();
-      var rec = await stateofdb
-          .query(tableName, where: '$thiColName =?', whereArgs: [0]);
-      return rec;
-    } catch (dbEror) {
-      throw "Database error $dbEror";
+      stateOfDB = await iniDB();
+      List<Map<String, dynamic>> results = await stateOfDB
+          .query(tableName, where: '$thiColName = ?', whereArgs: [0]);
+      return results;
+    } catch (error) {
+      throw 'database error $error';
     }
   }
 
-  Future<int> myRecUpdateTask(Map<String, dynamic> record, int id) async {
+  Future<int> myRecUpdateTask(Map<String, dynamic> map, int id) async {
     try {
-      stateofdb = await initStateOfDB();
-      int updareRec = await stateofdb.update(tableName, record,
-          where: '$firstColName =?', whereArgs: [id]);
-      return updareRec;
-    } catch (dbEror) {
-      throw "Database error $dbEror";
+      stateOfDB = await iniDB();
+      int rows = await stateOfDB
+          .update(tableName, map, where: '$firstColName = ?', whereArgs: [id]);
+      return rows;
+    } catch (error) {
+      throw 'database error $error';
     }
   }
 
   deleteTask(int id) async {
     try {
-      stateofdb = await initStateOfDB();
-      int row = await stateofdb
-          .delete(tableName, where: '$firstColName =?', whereArgs: [id]);
-      return row;
-    } catch (dbError) {
-      throw 'Database error $dbError';
+      stateOfDB = await iniDB();
+      int rows = await stateOfDB
+          .delete(tableName, where: '$firstColName = ?', whereArgs: [id]);
+      return rows;
+    } catch (error) {
+      throw 'database error $error';
     }
   }
 
   deleteAllTask() async {
     try {
-      stateofdb = await initStateOfDB();
-      await stateofdb.delete(tableName);
-    } catch (dbError) {
-      throw 'Database error $dbError';
+      stateOfDB = await iniDB();
+      int rows = await stateOfDB.delete(tableName);
+      return rows;
+    } catch (error) {
+      throw 'database error $error';
     }
   }
 }

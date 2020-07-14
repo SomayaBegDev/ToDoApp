@@ -12,18 +12,18 @@ class Task {
 
   Task.fromJson(Map<String, dynamic> map) {
     bool taskState = false;
-    if (DBHelper.thiColName == 1) {
+    if (DBHelper.dbHelper.thiColName == 1) {
       taskState = true;
     }
-    this.id = map["${DBHelper.firstColName}"];
-    this.aTask = map["${DBHelper.sectColName}"];
+    this.id = map["${DBHelper.dbHelper.firstColName}"];
+    this.aTask = map["${DBHelper.dbHelper.sectColName}"];
     this.isComplete = taskState;
   }
 
   Map<String, dynamic> toJson() {
     return {
-      DBHelper.sectColName: this.aTask,
-      DBHelper.thiColName: this.isComplete ? 1 : 0
+      DBHelper.dbHelper.sectColName: this.aTask,
+      DBHelper.dbHelper.thiColName: this.isComplete ? 1 : 0
     };
   }
 
